@@ -114,37 +114,52 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //MODAL WINDOW
 
-    const modalTrigger = document.querySelectorAll('[data-modal]'),
-          modal = document.querySelector('.modal'),
-          modalCloseBtn = document.querySelector('[data-close]');
+    const modalTrigger = document.querySelectorAll('[data-modal]'),                  //Создаем переменные по атрибутам элемента
+          modal = document.querySelector('.modal'),                                  //Переменная модального окна
+          modalCloseBtn = document.querySelector('[data-close]');                    //Переменная крестика закрытия
     
     modalTrigger.forEach(item => {
-        item.addEventListener('click', (e) => {
-            modal.classList.add('show');
-            modal.classList.remove('hide');
-            document.body.style.overflow = 'hidden';
-        });
+        item.addEventListener('click', modalOpen);                                   //Перебираем триггеры(кнопки) и создаем для каждого событие клик с функцией открытия модально окна
     });
+
+    function modalOpen() {
+        modal.classList.add('show');                                                //Функция открытия модально окна       --добавляется класс
+        modal.classList.remove('hide');                                             //                                     --удаляется класс  
+        document.body.style.overflow = 'hidden';                                    //                                     --добавляется свойство css
+        clearInterval(modalTimerId);                                                //                                     --удаляется функция интервала
+    }
     
     function closeModal () {
-        modal.classList.add('hide');
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
+        modal.classList.add('hide');                                               //Функция закрытия модально окна       --добавляется класс
+        modal.classList.remove('show');                                            //                                     --удаляется класс
+        document.body.style.overflow = 'auto';                                     //                                     --добавляется свойство css
     }
 
-    modalCloseBtn.addEventListener('click', closeModal);
+    modalCloseBtn.addEventListener('click', closeModal);                           //Навешивается события на крестик для закрытия модального окна
 
-    modal.addEventListener('click', (e) => {
+    modal.addEventListener('click', (e) => {                                       //Если клик на область вне модально окна то функция закрытия
         if (e.target === modal) {
             closeModal();
         }
     });
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', (e) => {                                  //Событие при нажатии на кнопку "Escape", тоже закрытие окна
         if (e.key === 'Escape' && modal.classList.contains('show')) {
             closeModal();
         }
     });
+
+    const modalTimerId = setTimeout(modalOpen, 10000);                             //Открытие модального окна через 10с через функцию setTimeout
+
+    function showModalByScroll() {                                                                                    //Если сумма высоты документа и высоты экрана больше либо равно 
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {    //перемещению по высоте документа
+            modalOpen();                                                                                              //вызываем функцию открытия окна
+            window.removeEventListener('scroll', showModalByScroll);                                                  //и удаляем событие скролла с этой самой функцией
+        }
+    }
+
+    window.addEventListener('scroll', showModalByScroll);                           //Событие скролла с функцией showModalByScroll
+
 
 });
 
