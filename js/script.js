@@ -149,7 +149,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const modalTimerId = setTimeout(modalOpen, 10000);                             //Открытие модального окна через 10с через функцию setTimeout
+    //const modalTimerId = setTimeout(modalOpen, 10000);                             //Открытие модального окна через 10с через функцию setTimeout
 
     function showModalByScroll() {                                                                                    //Если сумма высоты документа и высоты экрана больше либо равно 
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {    //перемещению по высоте документа
@@ -161,7 +161,97 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', showModalByScroll);                           //Событие скролла с функцией showModalByScroll
 
 
+    //CLASSES
+
+    class MenuCard {
+        constructor(src, alt, title, descr, price, parentSelector, ...classes) {        //Создаем конструктор класса с параметрами(аргументами), а также с rest оператором для добавления в будущем других аргументов
+            this.src = src;                                                             //путь к картинке
+            this.alt = alt;                                                             //альт картинки
+            this.title = title;                                                         //название карточки
+            this.descr = descr;                                                         //текст карточки
+            this.price = price;                                                         //цена на карточке
+            this.classes = classes;                                                     //массив из аргументов
+            this.parent = document.querySelector(parentSelector);                       //селектор элемента
+            this.transfer = 27;                                                         //курс доллара
+            this.changeToUAH();                                                         //метод, переводящий доллары в гривны
+        }
+
+        changeToUAH() {
+            this.price = this.price * this.transfer;                                    //Сам метод, переводящий доллары в гривны
+        }
+
+        render () {                                                                     //Основной метод render()
+            const element = document.createElement('div');                              //Создаем html элемент
+
+            if (this.classes.length === 0) {                                            //Создаем условие, что если в конструкторе в массиве classes 0 элементов
+                this.classes = 'menu__item';                                            //то добавляем в classes дефолтное значение класса
+                element.classList.add(this.classes);                                    //и добавляем к элементу этот класс
+            } else {
+                this.classes.forEach(className => {                                     //а иначе перебираем этот массив и добавляем к элементу эти классы, переданные в массив classes
+                    element.classList.add(className)
+                });
+            }
+
+            
+            element.innerHTML = `                                                       
+            
+                    <img src=${this.src} alt=${this.alt}>
+                    <h3 class="menu__item-subtitle">${this.title}</h3>
+                    <div class="menu__item-descr">${this.descr}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    </div>
+                
+            `
+                                                                                          
+            this.parent.append(element);                                                  //Добавляем наш элемент с содержимым в родительский элемент parent
+        }
+    }
+
+                                                                               
+    new MenuCard(                                                  //Создаем объект(элемент страницы) и подставляем аргументы конструктора, вызывая метод render()
+        "img/tabs/vegy.jpg",
+        "vegy",
+        'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        9,
+        '.menu .container',
+        'menu__item',
+        'big'
+    ).render();
+
+    new MenuCard(
+        "img/tabs/elite.jpg",
+        "elite",
+        'Меню “Премиум”',
+        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+        13,
+        '.menu .container',
+        'menu__item'
+    ).render();
+
+    new MenuCard(
+        "img/tabs/post.jpg",
+        "post",
+        'Меню "Постное"',
+        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+        14,
+        '.menu .container',
+        'menu__item'
+    ).render();
+
+        //ОПЕРАТОР REST
+
+    const log = function(a, b, ...rest) {        //оператор rest в данном примере собирает оставшиеся аргументы в массив
+        console.log(a, b, rest)
+    }
+    log(23, 24, 25, 27);
+
 });
+
+
 
 
 
