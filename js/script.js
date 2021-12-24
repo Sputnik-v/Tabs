@@ -276,33 +276,57 @@ window.addEventListener('DOMContentLoaded', () => {
             
             form.insertAdjacentElement('afterend', statusMessage);              //Добавляем в форму наш код
         
-            const request = new XMLHttpRequest();                              //Создаем объект на основе класса XML..
-            request.open('POST', 'server.php');                                //Инициализируем запрос на сервер методом POST
-            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');   //Отправляем заголовки
+            // const request = new XMLHttpRequest();                              //Создаем объект на основе класса XML..
+            // request.open('POST', 'server.php');                                //Инициализируем запрос на сервер методом POST
+         
+
+            // request.setRequestHeader('Content-type', 'application/json; charset=utf-8');   //Отправляем заголовки
             const formData = new FormData(form);                               //Создаем объект formData на основе класса FormData, передавая параметр нашей формы
 
-            const object = {};                                                 //Создаем пустой объект
-            formData.forEach(function(value, key){                             //Перебираем объект formData через foreach, где параметр будет функция 
-                object[key] = value;                                           //записывая в объект данные с объекта formData
+             const object = {};                                                 //Создаем пустой объект
+             formData.forEach(function(value, key){                             //Перебираем объект formData через foreach, где параметр будет функция 
+                 object[key] = value;                                           //записывая в объект данные с объекта formData
+             });
+            // const json = JSON.stringify(object);                               //Создаем константу, в которой будет лежать данные с объекта в JSON формате
+
+            fetch('server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(object)
+            })
+            .then(data => {
+                return data.text();
+            })
+            .then(data => {
+                console.log(data);
+                showThanksModal(message.success);
+                statusMessage.remove();
+            })
+            .catch(() => {
+                showThanksModal(message.failure);
+            })
+            .finally(() => {
+                form.reset();
             });
-            const json = JSON.stringify(object);                               //Создаем константу, в которой будет лежать данные с объекта в JSON формате
+           
+            // request.send(json);                                                //Отправляем на сервер наши json-данные
 
-            request.send(json);                                                //Отправляем на сервер наши json-данные
+            // request.addEventListener('load', () => {                           //Создаем событие load при загрузке данных на сервер
+            //     if (request.status === 200) {                                  //Если статус запроса, отправки 200
+            //         console.log(request.response);
 
-            request.addEventListener('load', () => {                           //Создаем событие load при загрузке данных на сервер
-                if (request.status === 200) {                                  //Если статус запроса, отправки 200
-                    console.log(request.response);
-
-                    showThanksModal(message.success);                          //Вызываем функцию нового модально окна после отправки
-                    form.reset();                                              //Скидываем данные с полей форм
-                   // closeModal();                                              //Закрывам модальное окно
-                    statusMessage.remove();
+            //         showThanksModal(message.success);                          //Вызываем функцию нового модально окна после отправки
+            //         form.reset();                                              //Скидываем данные с полей форм
+            
+            //         statusMessage.remove();
                         
                    
-                } else {
-                    showThanksModal(message.failure);
-                }
-            });
+            //     } else {
+            //         showThanksModal(message.failure);
+            //     }
+            // });
         });
     }
 
@@ -333,7 +357,19 @@ window.addEventListener('DOMContentLoaded', () => {
             
         }, 4000)                                                                   
     }
+
+    //*********************** FETCH API **********************/
     
+
+    // fetch('https://jsonplaceholder.typicode.com/posts', {
+    //     method: "POST",
+    //     body: JSON.stringify({name: 'Igor', family: 'Tronin'}),
+    //     headers: {
+    //         'Content-type': 'application/json'
+    //     }
+    // })
+    //     .then(response => response.json())
+    //     .then(json => console.log(json))
 
 });
 
