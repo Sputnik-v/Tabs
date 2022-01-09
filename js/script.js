@@ -209,37 +209,54 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const getResource = async (url) => {                                                 //Отправляем запрос на получение данных
+        const res = await fetch(url);
+
+        if (!res.ok) {                                                                   //Если статус не ок, выкидывем ошибку
+            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+        }
+
+        return await res.json();                                                         //Иначе возвращаем данные в json формате
+    };
+
+    getResource('http://localhost:3000/menu')                                            //делаем запрос на сервер
+        .then(data => {                                                                  //Получаем ответ
+            data.forEach(({img, altimg, title, descr, price}) => {                              //Перебираем данные, создавая новый объект на основе класса и применяя к нему метод render()
+                new MenuCard(img, altimg, title, descr, price, '.menu .container').render();     //Используем деструктуризацию для перебора свойств объекта
+            })
+        });
+
+    // axios.get('http://localhost:3000/menu')
+    //     .then(dataProm => {                                                                      //Получение данных с сервера при помощи библиотеки axios
+    //         dataProm.data.forEach(({img, altimg, title, descr, price}) => {                              
+    //             new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+    //         });
+    //     });
+
                                                                                
-    new MenuCard(                                                  //Создаем объект(элемент страницы) и подставляем аргументы конструктора, вызывая метод render()
-        "img/tabs/vegy.jpg",
-        "vegy",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        9,
-        '.menu .container',
-        'menu__item',
-        'big'
-    ).render();
+    // getResource('http://localhost:3000/menu')
+    //     .then(data => {
+    //         createCard(data);                                                   //Делаем запрос на сервер и вызываем функцию обработки данных
+    //     });
 
-    new MenuCard(
-        "img/tabs/elite.jpg",
-        "elite",
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        13,
-        '.menu .container',
-        'menu__item'
-    ).render();
+    // function createCard(data) {                                                 //Функция работы с данными
+    //     data.forEach(({img, altimg, title, descr, price}) => {                  //Перебираем данные, раскладывая полученный объект на свойства
+    //         const element = document.createElement('div');                      //Создаем элемент
+    //         element.classList.add('menu__item');                                //Добавляем класс и разметку со свойствами в нашем полученном объекте
+    //         element.innerHTML = `                                               
+    //             <img src=${img} alt=${altimg}>
+    //             <h3 class="menu__item-subtitle">${title}</h3>
+    //             <div class="menu__item-descr">${descr}</div>
+    //             <div class="menu__item-divider"></div>
+    //             <div class="menu__item-price">
+    //                 <div class="menu__item-cost">Цена:</div>
+    //                 <div class="menu__item-total"><span>${price}</span> грн/день</div>
+    //             </div>
+    //         `;
 
-    new MenuCard(
-        "img/tabs/post.jpg",
-        "post",
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        14,
-        '.menu .container',
-        'menu__item'
-    ).render();
+    //         document.querySelector('.menu .container').append(element);          //Добавляем элемент на страницу
+    //     })
+    // }   
 
         //ОПЕРАТОР REST
 
@@ -259,11 +276,23 @@ window.addEventListener('DOMContentLoaded', () => {
         failure: 'Что-то пошло не так...'
     };
 
+
     forms.forEach(item => {                                                     //Перебираем формы, подставляя их в аргумент функции
-        postData(item);
+        bindPostData(item);
     });
 
-    function postData(form) {                                                  //Основная функция
+    const postData = async (url, data) => {
+        const res = await fetch(url, {                                         //Создаем асинхронную функцию
+            method: 'POST',                                                    //и ожидаем fetch
+            headers: {                                                         //после этого возвращаем ответ в json формате
+                'Content-Type': 'application/json'
+            },
+            body: data
+        });
+        return await res.json();
+    };
+
+    function bindPostData(form) {                                                  //Основная функция
         form.addEventListener('submit', (e) => {                               //Событие при отправке формы submit
             e.preventDefault();                                                //Изменяем стандартное действия браузера
 
@@ -283,22 +312,11 @@ window.addEventListener('DOMContentLoaded', () => {
             // request.setRequestHeader('Content-type', 'application/json; charset=utf-8');   //Отправляем заголовки
             const formData = new FormData(form);                               //Создаем объект formData на основе класса FormData, передавая параметр нашей формы
 
-             const object = {};                                                 //Создаем пустой объект
-             formData.forEach(function(value, key){                             //Перебираем объект formData через foreach, где параметр будет функция 
-                 object[key] = value;                                           //записывая в объект данные с объекта formData
-             });
-            // const json = JSON.stringify(object);                               //Создаем константу, в которой будет лежать данные с объекта в JSON формате
-
-            fetch('server.php', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json'
-                },
-                body: JSON.stringify(object)
-            })
-            .then(data => {
-                return data.text();
-            })
+             
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));              //Берем formData, сначало превращаем массив массивов ее, после этого превращаем ее в классический объект, а после уже превращаем в JSON
+                                                                                              
+           
+            postData('http://localhost:3000/requests', json)                       //Отправляем данные на сервер
             .then(data => {
                 console.log(data);
                 showThanksModal(message.success);
@@ -371,9 +389,9 @@ window.addEventListener('DOMContentLoaded', () => {
     //     .then(response => response.json())
     //     .then(json => console.log(json))
 
-    fetch('http://localhost:3000/menu')
-        .then(data => data.json())
-        .then(res => console.log(res));
+    // fetch('http://localhost:3000/menu')
+    //     .then(data => data.json())
+    //     .then(res => console.log(res));
 });
 
 
