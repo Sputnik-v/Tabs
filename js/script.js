@@ -1,5 +1,8 @@
 "use strict"
 
+require('es6-promise').polyfill();
+import 'nodelist-foreach-polyfill';
+
 import tabs from './modules/tabs';
 import modalWindow from './modules/modalwindow';
 import timer from './modules/timer';
